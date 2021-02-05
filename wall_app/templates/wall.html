@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Success</title>
+</head>
+<body>
+
+    <h1>CodingDojo Wall</h1> 
+    <p>Welcome {{ user.first_name }}</p>
+    <a href="/logout">Log Out</a>
+    
+    <h3>Post a message</h3>
+    <form action="/wall/create" method="post">
+        {% csrf_token %}
+        <textarea name="message" id="message" cols="150" rows="7"></textarea><br>
+        <button type="submit">Post a message</button>
+    </form>
+    {% for message in all_messages %}
+        <p><strong>{{ message.user_id.first_name }} {{ message.user_id.last_name }} - {{ message.created_at }}</strong></p>
+        <p style="margin-left: 40px">{{ message.message }}</p>
+        {% if user == message.user_id %}
+            <a href="/wall/delete/{{ message.id }}"><button type="submit" style="margin-left: 40px">Delete Message</button></a>
+        {% endif %}
+        {% for comment in message.message_comments.all %}
+            <p style="margin-left: 40px"><strong>{{ comment.user_id.first_name }} {{ comment.user_id.last_name }} - {{ comment.created_at }}</strong></p>
+            <p style="margin-left: 40px">
+                {{comment.comment}}
+                {% if user == comment.user_id %}
+                    <a href="/wall/comment/delete/{{ comment.id }}"><button type="submit" style="margin-left: 40px">Delete Comment</button></a>
+                {% endif %}
+            </p>
+        {% endfor %}
+
+        <form action="/wall/comment/{{ message.id }}" method="post" style="margin-left: 40px">
+            {% csrf_token %}
+            <textarea name="comment" id="comment" cols="100" rows="3"></textarea><br>
+            <button type="submit">Post a comment</button>
+        </form>
+    {% endfor %}
+</body>
+</html>
